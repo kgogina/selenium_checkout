@@ -1,0 +1,168 @@
+
+//open page https://www.saucedemo.com/
+//entering username
+//entering password
+//click log in
+//add the a third item to the cart
+//click button Add to card
+//navigate to the cart 
+//check out the item
+//entering first name
+//entering last name
+//entering Postal code
+//click continue 
+//click finish
+//assert for your order confirmed
+
+
+
+package tests;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import com.github.javafaker.Faker;
+
+
+public class SaucedemoTest {
+	
+	private static final Faker faker = new Faker();
+
+	private static final String HOME_PAGE_URL = "https://www.saucedemo.com/";
+	private static final String CUSTOM_USERNAME = "standard_user";
+	private static final String CUSTOM_PASSWORD = "secret_sauce";
+	private static final String FIRST_NAME = faker.name().firstName();
+	private static final String LAST_NAME = faker.name().lastName();
+	private static final String POSTAL_CODE = faker.address().zipCode();
+
+	private static final By USERNAME = By.id("user-name");
+	private static final By PASSWORD = By.id("password");
+	private static final By BUTTON_LOGIN = By.id("login-button");
+	
+	private static final By THIRD_ITEM = By.xpath("(//div[@class='inventory_item'])[3]");
+	private static final By BUTTON_ADD_TO_CART = By.xpath("(//div[@class='inventory_item']//button)[3]");
+	private static final By BASKET_ICON = By.xpath("(//a[@class='shopping_cart_link'])[1]");
+	
+	private static final By CHECKOUT_BUTTON = By.id("checkout");
+	
+	private static final By FIRST_NAME_FIELD = By.id("first-name");
+	private static final By LAST_NAME_FIELD = By.id("last-name");
+	private static final By ZIP_FIELD = By.id("postal-code");
+	private static final By CONTINUE_BUTTON = By.id("continue");
+	
+	
+	private static final By FINISH_BUTTON = By.id("finish");
+	
+	private static final By COMPLETE_HEADER = By.xpath("//h2[@data-test='complete-header']");
+
+	private ChromeDriver driver;
+	private WebDriverWait wait;
+
+	@BeforeMethod
+	public void setUp() {
+		driver = new ChromeDriver();
+		driver.manage().window().maximize();
+		wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+	}
+
+	@AfterMethod
+	public void tearDown() {
+		driver.quit();
+	}
+
+	private void clickButton(By locator) {
+		WebElement button = driver.findElement(locator);
+		button.click();
+	}
+
+	//log in page
+	private void openHomePage() {
+		driver.get(HOME_PAGE_URL);
+	}
+
+	private void enterUsername() {
+		WebElement username = driver.findElement(USERNAME);
+		username.sendKeys(CUSTOM_USERNAME);
+	}
+
+	private void enterPassword() {
+		WebElement password = driver.findElement(PASSWORD);
+		password.sendKeys(CUSTOM_PASSWORD);
+	}
+
+	private void signInUser() {
+		clickButton(BUTTON_LOGIN);
+	}
+	
+	private String getThirdProduct() {
+		WebElement productName = driver.findElement(THIRD_ITEM);
+		return productName.getText();
+	}
+
+	private void addItemToCart() {
+		clickButton(BUTTON_ADD_TO_CART);
+	}
+
+	private void viewCart() {
+		clickButton(BASKET_ICON);
+	}
+
+	private void proceedToCheckout() {
+		clickButton(CHECKOUT_BUTTON);
+	}
+
+	private void enterFirstName() {
+		WebElement firstNameField = driver.findElement(FIRST_NAME_FIELD);
+		firstNameField.sendKeys(FIRST_NAME);
+	}
+
+	private void enterLastName() {
+		WebElement lastNameField = driver.findElement(LAST_NAME_FIELD);
+		lastNameField.sendKeys(LAST_NAME);
+	}
+
+	private void enterZipCode() {
+		WebElement zipCodeField = driver.findElement(ZIP_FIELD);
+		zipCodeField.sendKeys(POSTAL_CODE);
+	}
+
+	private void goToTheNextPage() {
+		clickButton(CONTINUE_BUTTON);
+	}
+
+	private void completeTransaction() {
+		clickButton(FINISH_BUTTON);
+	}
+
+	private String getCompleteHeader() {
+		WebElement paymentConfirmationHeader = driver.findElement(COMPLETE_HEADER);
+		return paymentConfirmationHeader.getText();
+	}
+
+	@Test
+	public void endToendSaucedemoTest() throws InterruptedException {
+
+		openHomePage();
+		enterUsername();
+		enterPassword();
+		signInUser();
+		getThirdProduct();
+		addItemToCart();
+		viewCart();
+		proceedToCheckout();
+		enterFirstName();
+		enterLastName();
+		enterZipCode();
+		goToTheNextPage();
+		completeTransaction();
+		Assert.assertFalse(getCompleteHeader().isEmpty());
+	}
+}
